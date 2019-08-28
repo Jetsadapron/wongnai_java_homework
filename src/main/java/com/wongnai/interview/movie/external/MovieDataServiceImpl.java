@@ -1,10 +1,13 @@
 package com.wongnai.interview.movie.external;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestOperations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 
 @Component
 public class MovieDataServiceImpl implements MovieDataService {
@@ -24,6 +27,17 @@ public class MovieDataServiceImpl implements MovieDataService {
 		// Please noted that you must only read data remotely and only from given source,
 		// do not download and use local file or put the file anywhere else.
 
-		return null;
+		// Read json data from URL
+		String result = restTemplate.getForObject(MOVIE_DATA_URL, String.class);
+
+		// Covert String json data to object of moviesResponse
+		MoviesResponse moviesResponse = null;
+		try {
+			moviesResponse = objectMapper.readValue(result, new TypeReference<MoviesResponse>() {});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return moviesResponse;
 	}
 }
