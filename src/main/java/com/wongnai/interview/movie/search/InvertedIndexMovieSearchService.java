@@ -1,7 +1,9 @@
 package com.wongnai.interview.movie.search;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.wongnai.interview.movie.sync.MovieInvertedIndex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
@@ -15,6 +17,10 @@ import com.wongnai.interview.movie.MovieSearchService;
 public class InvertedIndexMovieSearchService implements MovieSearchService {
 	@Autowired
 	private MovieRepository movieRepository;
+
+
+	@Autowired
+	private MovieInvertedIndex movieInvertedIndex;
 
 	@Override
 	public List<Movie> search(String queryText) {
@@ -35,6 +41,13 @@ public class InvertedIndexMovieSearchService implements MovieSearchService {
 		// you have to return can be union or intersection of those 2 sets of ids.
 		// By the way, in this assignment, you must use intersection so that it left for just movie id 5.
 
-		return null;
+		List<Long> moviesId = movieInvertedIndex.findMoviesIdByQueryText( queryText );
+
+		List<Movie> movies = new ArrayList<>();
+		if( moviesId.size() > 0) {
+			movies = movieRepository.findByIdsContains(moviesId);
+		}
+
+		return movies;
 	}
 }

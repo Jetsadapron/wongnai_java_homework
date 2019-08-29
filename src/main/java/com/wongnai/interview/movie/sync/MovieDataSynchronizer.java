@@ -19,6 +19,9 @@ public class MovieDataSynchronizer {
 	@Autowired
 	private MovieRepository movieRepository;
 
+	@Autowired
+	private MovieInvertedIndex movieInvertedIndex;
+
 	@Transactional
 	public void forceSync() {
 		//TODO: implement this to sync movie into repository
@@ -26,7 +29,7 @@ public class MovieDataSynchronizer {
 		// Get movies data response
 		MoviesResponse moviesResponse = movieDataService.fetchAll();
 
-		// Loop for sync movies into repository
+		// Loop for sync movies into repository and make movie inverted index
 		for (MovieData movieData : moviesResponse) {
 
 			// Construct movie and set data
@@ -36,6 +39,8 @@ public class MovieDataSynchronizer {
 			// sync each movie into repository
 			Movie saved = movieRepository.save(movie);
 
+			// make movie inverted index
+			movieInvertedIndex.addMovieTermToMovieIds(saved);
 		}
 	}
 }
